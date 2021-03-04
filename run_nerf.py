@@ -882,8 +882,11 @@ def train():
                 if args.N_importance > 0:
                     tf.contrib.summary.scalar('psnr0', psnr0)
 
-            if i % args.i_img == 0:
+            testimgdir = os.path.join(basedir, expname, 'tboard_val_imgs')
+            if i==0 or i==1:
+                os.makedirs(testimgdir, exist_ok=True)
 
+            if i % args.i_img == 0:
                 # Log a rendered validation view to Tensorboard
                 img_i = np.random.choice(i_val)
                 target = images[img_i]
@@ -895,9 +898,6 @@ def train():
                 psnr = mse2psnr(img2mse(rgb, target))
                 
                 # Save out the validation image for Tensorboard-free monitoring
-                testimgdir = os.path.join(basedir, expname, 'tboard_val_imgs')
-                if i==0:
-                    os.makedirs(testimgdir, exist_ok=True)
                 imageio.imwrite(os.path.join(testimgdir, '{:06d}.png'.format(i)), to8b(rgb))
 
                 with tf.contrib.summary.record_summaries_every_n_global_steps(args.i_img):
